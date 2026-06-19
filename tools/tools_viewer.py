@@ -7,7 +7,6 @@ from io import BytesIO
 def show_tools_section():
     col1, col2, col3 = st.columns(3)
 
-    # --- Disk Health ---
     with col1:
         st.markdown("### 💽 Disk Health")
         disk = psutil.disk_usage('/')
@@ -27,11 +26,9 @@ def show_tools_section():
         st.caption(f"Free Space: {free_gb} GB / {total_gb} GB")
         st.caption(f"Temperature: {temp}°C")
 
-    # --- Data Export ---
     with col2:
         st.markdown("### 📤 Data Export")
 
-        # Example logs DataFrame (replace with your actual logs)
         logs_df = pd.DataFrame({
             "Error": ["High CPU usage", "High Memory usage"],
             "Severity": ["Warning", "Critical"]
@@ -39,7 +36,6 @@ def show_tools_section():
 
         metrics_df = st.session_state.get("metric_history", pd.DataFrame())
 
-        # Export Logs
         csv_logs = logs_df.to_csv(index=False).encode("utf-8")
         st.download_button("📑 Export Logs (CSV)", csv_logs, "logs.csv", "text/csv", use_container_width=True)
 
@@ -50,7 +46,6 @@ def show_tools_section():
                            "logs.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            use_container_width=True)
 
-        # Export Metrics
         if not metrics_df.empty:
             csv_metrics = metrics_df.to_csv(index=False).encode("utf-8")
             st.download_button("📊 Download Metrics (CSV)", csv_metrics, "metrics.csv", "text/csv", use_container_width=True)
@@ -64,7 +59,6 @@ def show_tools_section():
         else:
             st.info("ℹ️ No metrics available to export.")
 
-        # Generate Report (Logs + Metrics)
         if not metrics_df.empty:
             report_df = pd.concat([logs_df, metrics_df], axis=1)
         else:
@@ -87,7 +81,6 @@ def show_tools_section():
         st.caption("Retention Period")
         st.slider("Days", 7, 30, 15)
 
-    # --- Process Manager ---
     with col3:
         st.markdown("### ⚙️ Process Manager")
         processes = []
