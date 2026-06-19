@@ -40,8 +40,3 @@ Open the local URL printed by Streamlit (usually http://localhost:8501).
 ## Contributing
 Open issues or PRs on GitHub. Follow standard GitHub flow: feature branch → PR → review → merge.
 
-## License
-Specify a license (e.g., MIT) or update this section before release.
-
-## Contact
-Maintainer: Adwaith (https://github.com/Adwaith14-dotcom)
