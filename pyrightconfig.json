@@ -1,0 +1,11 @@
+{
+  "include": ["*.py"],
+  "extraPaths": [
+    "C:/Users/adwai/SelfHealingStreamlit/.venv/Lib/site-packages"
+  ],
+  "diagnosticSeverityOverrides": {
+    "reportAttributeAccessIssue": "none",
+    "reportMissingImports": "none",
+    "reportMissingModuleSource": "none"
+  }
+}

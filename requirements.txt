@@ -1,0 +1,10 @@
+streamlit
+psutil
+pandas
+plotly
+matplotlib
+fpdf
+openpyxl
+pywebview
+pywin32
+pyautogui
