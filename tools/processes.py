@@ -30,7 +30,6 @@ def show_process_manager():
     df = get_top_processes()
     st.dataframe(df, use_container_width=True)
 
-    # Select process by PID
     pid_to_kill = st.number_input("Enter PID to terminate", min_value=0, step=1)
 
     if st.button("Terminate Process"):
@@ -44,12 +43,10 @@ def show_process_manager():
         else:
             st.warning("Please enter a valid PID.")
 
-    # Refresh button
     if st.button("🔄 Refresh Process List"):
         df = get_top_processes()
         st.dataframe(df, use_container_width=True)
 
-    # Extra: Kill top memory process quickly
     if st.button("⚡ End Top Memory Process"):
         if not df.empty:
             top_pid = df.iloc[0]["PID"]
