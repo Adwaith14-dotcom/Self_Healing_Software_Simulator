@@ -3,11 +3,10 @@ import time
 import queue
 import pandas as pd
 
-# Shared queue for capture results
 capture_queue = queue.Queue()
 
 MAX_RETRIES = 3
-COOLDOWN = 5  # seconds between retries
+COOLDOWN = 5  
 
 def check_login():
     attempts = 0
