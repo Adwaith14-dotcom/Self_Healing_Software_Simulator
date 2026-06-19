@@ -14,11 +14,9 @@ def export_logs():
         logs_df = pd.DataFrame(st.session_state["logs"], columns=["Log Entry"])
         st.dataframe(logs_df.tail(10), use_container_width=True)
 
-        # CSV Export
         csv = logs_df.to_csv(index=False).encode("utf-8")
         st.download_button("⬇️ Download Logs as CSV", csv, "system_logs.csv", "text/csv")
 
-        # Excel Export with auto-fit
         buffer = BytesIO()
         with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
             logs_df.to_excel(writer, index=False, sheet_name="Logs")
@@ -41,7 +39,6 @@ def export_metrics():
         df = st.session_state.metric_history
         st.dataframe(df.tail(10), use_container_width=True)
 
-        # Summary statistics
         summary = {
             "Average CPU %": round(df["CPU"].mean(), 2),
             "Max CPU %": round(df["CPU"].max(), 2),
@@ -53,24 +50,20 @@ def export_metrics():
         }
         summary_df = pd.DataFrame(list(summary.items()), columns=["Metric", "Value"])
 
-        # CSV Export
         combined_csv = pd.concat([summary_df, df], axis=0)
         csv = combined_csv.to_csv(index=False).encode("utf-8")
         st.download_button("⬇️ Download Metrics as CSV", csv, "metrics_report.csv", "text/csv")
 
-        # Excel Export with formatting
         buffer = BytesIO()
         with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
             summary_df.to_excel(writer, index=False, sheet_name="Summary")
             df.to_excel(writer, index=False, sheet_name="Raw Data")
             ws = writer.sheets["Raw Data"]
 
-            # Auto-fit columns
             for i, col in enumerate(df.columns, 1):
                 max_len = max(df[col].astype(str).map(len).max(), len(col))
                 ws.column_dimensions[get_column_letter(i)].width = max_len + 2
 
-            # Conditional formatting
             for row in range(2, len(df) + 2):
                 cpu = ws[f"B{row}"]
                 mem = ws[f"C{row}"]
@@ -86,7 +79,6 @@ def export_metrics():
                            "metrics_report.xlsx",
                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-        # Line charts
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
         df["CPU"].plot(ax=ax[0], title="CPU Usage (%)", color="blue")
         df["Memory"].plot(ax=ax[1], title="Memory Usage (%)", color="orange")
@@ -96,7 +88,6 @@ def export_metrics():
         plt.savefig(chart_buf, format="png")
         chart_buf.seek(0)
 
-        # Pie chart
         fig2, ax2 = plt.subplots(figsize=(5, 5))
         latest_values = [df["CPU"].iloc[-1], df["Memory"].iloc[-1], df["Disk"].iloc[-1]]
         labels = ["CPU", "Memory", "Disk"]
@@ -107,57 +98,51 @@ def export_metrics():
         plt.savefig(pie_buf, format="png")
         pie_buf.seek(0)
 
-        # Build PDF
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", "B", 20)
         pdf.set_text_color(0, 102, 204)
-        pdf.cell(200, 15, "System Metrics Report", ln=True, align="C")  # type: ignore
+        pdf.cell(200, 15, "System Metrics Report", ln=True, align="C") 
         pdf.set_font("Arial", "", 12)
         pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, f"Generated on: {pd.Timestamp.now()}", ln=True)  # type: ignore
-        pdf.ln(10)  # type: ignore
+        pdf.cell(0, 10, f"Generated on: {pd.Timestamp.now()}", ln=True)  
+        pdf.ln(10)  
 
-        # Summary table
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, "Summary Statistics", ln=True)  # type: ignore
+        pdf.cell(0, 10, "Summary Statistics", ln=True)  
         pdf.set_font("Arial", "", 12)
         for k, v in summary.items():
-            pdf.cell(90, 10, k, border=1)  # type: ignore
-            pdf.cell(90, 10, str(v), border=1, ln=True)  # type: ignore
-        pdf.ln(10)  # type: ignore
+            pdf.cell(90, 10, k, border=1) 
+            pdf.cell(90, 10, str(v), border=1, ln=True)  
+        pdf.ln(10)  
 
-        # Charts
-        pdf.cell(0, 10, "Usage Trends", ln=True)  # type: ignore
+        pdf.cell(0, 10, "Usage Trends", ln=True) e
         pdf.image(chart_buf, x=10, y=None, w=180)
 
-        # Insights
         pdf.add_page()
         pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 10, "Insights", ln=True)  # type: ignore
+        pdf.cell(0, 10, "Insights", ln=True)  
         pdf.set_font("Arial", "", 12)
 
         cpu_val, mem_val, disk_val = latest_values
         if cpu_val < 50:
-            pdf.multi_cell(0, 10, f"⚡ CPU usage is low at {cpu_val}%, indicating stable performance.")  # type: ignore
-        elif cpu_val < 80:
-            pdf.multi_cell(0, 10, f"⚡ CPU usage is moderate at {cpu_val}%, system is handling load well.")  # type: ignore
+            pdf.multi_cell(0, 10, f"⚡ CPU usage is low at {cpu_val}%, indicating stable performance.")  
+            pdf.multi_cell(0, 10, f"⚡ CPU usage is moderate at {cpu_val}%, system is handling load well.")  
         else:
-            pdf.multi_cell(0, 10, f"⚡ CPU usage is high at {cpu_val}%, potential bottleneck detected.")  # type: ignore
+            pdf.multi_cell(0, 10, f"⚡ CPU usage is high at {cpu_val}%, potential bottleneck detected.")  
 
         if mem_val < 50:
-            pdf.multi_cell(0, 10, f"💾 Memory usage is healthy at {mem_val}%.")  # type: ignore
+            pdf.multi_cell(0, 10, f"💾 Memory usage is healthy at {mem_val}%.")  
         elif mem_val < 70:
-            pdf.multi_cell(0, 10, f"💾 Memory usage is moderately high at {mem_val}%, optimization may help.")  # type: ignore
+            pdf.multi_cell(0, 10, f"💾 Memory usage is moderately high at {mem_val}%, optimization may help.")  
         else:
-            pdf.multi_cell(0, 10, f"💾 Memory usage is critical at {mem_val}%, risk of slowdown.")  # type: ignore
+            pdf.multi_cell(0, 10, f"💾 Memory usage is critical at {mem_val}%, risk of slowdown.")  
 
         if disk_val < 70:
-            pdf.multi_cell(0, 10, f"📂 Disk usage is balanced at {disk_val}%.")  # type: ignore
+            pdf.multi_cell(0, 10, f"📂 Disk usage is balanced at {disk_val}%.") 
         else:
-            pdf.multi_cell(0, 10, f"📂 Disk usage is heavy at {disk_val}%, consider cleanup or expansion.")  # type: ignore
-
-        pdf.ln(10)  # type: ignore
+            pdf.multi_cell(0, 10, f"📂 Disk usage is heavy at {disk_val}%, consider cleanup or expansion.")  
+        pdf.ln(10)  
         pdf.cell(0, 10, "Resource Distribution", ln=True)  # type: ignore
         pdf.image(pie_buf, x=40, y=None, w=120)
 
